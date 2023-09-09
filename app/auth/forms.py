@@ -36,7 +36,7 @@ class RegisterForm(FlaskForm):
         for symbol in field.data:
             if symbol not in allowed_symbols:
                 raise ValidationError(
-                    message='Username is not valid.Letters, digits and @/./+/-/_ only.'
+                    message='Username is not valid. Letters, digits and @/./+/-/_ only.'
                 )
 
     def validate_email(self, field):
@@ -63,3 +63,27 @@ class LoginForm(FlaskForm):
             username=self.username.data)
         if not check_password_hash(user_with_username.hashed_password, field.data):
             raise ValidationError('Wrong password.')
+
+
+class ChangeUserForm(FlaskForm):
+    username = StringField(label='Username*', validators=[InputRequired(),
+                                                          Length(min=5, max=255)])
+    email = EmailField(label='Email*', validators=[InputRequired(),
+                                                   Length(max=255),
+                                                   Email(message='Invalid email address.')])
+
+    def validate_username(self, field):
+        current_user = g.user
+        user_with_username = get_user_with_username(username=field.data)
+        if user_with_username and (user_with_username != current_user):
+            raise ValidationError(message='This username is already taken.')
+        allowed_symbols = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@.+-_'
+        for symbol in field.data:
+            raise ValidationError(
+                message='Username is not valid. Letters, digits and @/./+/-/_ only.')
+
+    def validate_email(self, field):
+        current_user = g.user
+        user_with_email = get_user_with_email(email=field.data)
+        if user_with_email and (user_with_email != current_user):
+            raise ValidationError(message='This email is already taken.')
