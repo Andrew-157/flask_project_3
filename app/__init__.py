@@ -1,10 +1,20 @@
+import functools
 
-from flask import Flask
+from flask import Flask, g, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy.orm import DeclarativeBase
 
 from config import config
+
+
+def login_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            return redirect(url_for('auth.become_user'))
+        return view(**kwargs)
+    return wrapped_view
 
 
 class Base(DeclarativeBase):
@@ -21,8 +31,13 @@ def create_app(config_name: str = 'production'):
     app.config.from_object(config[config_name])
 
     from .import models
+    from .auth.urls import bp as auth_bp
+    from .main.urls import bp as main_bp
 
     db.init_app(app)
     migrate.init_app(app=app, db=db)
+
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(main_bp)
 
     return app

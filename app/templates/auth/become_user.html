@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center">
+        <h1>Looks like you are not allowed to visit the page while you are not authenticated</h1>
+        <br>
+        <h3>Follow one of the following links:</h3>
+        <div class="btn-group">
+            <a class="btn btn-primary btn-lg" href="{{ url_for('auth.login') }}">Login</a>
+        </div>
+        <div class="btn-group">
+            <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">Register</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

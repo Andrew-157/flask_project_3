@@ -65,12 +65,9 @@ class LoginForm(FlaskForm):
             raise ValidationError('Wrong password.')
 
 
-class ChangeUserForm(FlaskForm):
-    username = StringField(label='Username*', validators=[InputRequired(),
-                                                          Length(min=5, max=255)])
-    email = EmailField(label='Email*', validators=[InputRequired(),
-                                                   Length(max=255),
-                                                   Email(message='Invalid email address.')])
+class UpdateUserForm(RegisterForm):
+    password1 = None
+    password2 = None
 
     def validate_username(self, field):
         current_user = g.user
@@ -79,8 +76,9 @@ class ChangeUserForm(FlaskForm):
             raise ValidationError(message='This username is already taken.')
         allowed_symbols = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@.+-_'
         for symbol in field.data:
-            raise ValidationError(
-                message='Username is not valid. Letters, digits and @/./+/-/_ only.')
+            if symbol not in allowed_symbols:
+                raise ValidationError(
+                    message='Username is not valid. Letters, digits and @/./+/-/_ only.')
 
     def validate_email(self, field):
         current_user = g.user
