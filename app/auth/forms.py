@@ -45,3 +45,21 @@ class RegisterForm(FlaskForm):
             raise ValidationError(
                 message='This email is already taken.'
             )
+
+
+class LoginForm(FlaskForm):
+    username = StringField(label='Username*', validators=[InputRequired(),
+                                                          Length(min=5, max=255)])
+    password = PasswordField(label='Password*', validators=[InputRequired(),
+                                                            Length(min=5, max=255)])
+
+    def validate_username(self, field):
+        user_with_username = get_user_with_username(username=field.data)
+        if not user_with_username:
+            raise ValidationError('This username was not found.')
+
+    def validate_password(self, field):
+        user_with_username = get_user_with_username(
+            username=self.username.data)
+        if not check_password_hash(user_with_username.hashed_password, field.data):
+            raise ValidationError('Wrong password.')
