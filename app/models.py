@@ -68,8 +68,12 @@ class Recommendation(Base):
         DateTime(timezone=True), default=datetime.utcnow())
     updated: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=True)
-    user_id: Mapped[int] = mapped_column(ForeignKey('user.id'))
-    fiction_type_id: Mapped[int] = mapped_column(ForeignKey('fiction_type.id'))
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id',
+                                                    ondelete='CASCADE',
+                                                    onupdate='CASCADE'))
+    fiction_type_id: Mapped[int] = mapped_column(ForeignKey('fiction_type.id',
+                                                            ondelete='CASCADE',
+                                                            onupdate='CASCADE'))
 
     user: Mapped[User] = relationship(
         back_populates='recommendations')
@@ -80,6 +84,9 @@ class Recommendation(Base):
     tags: Mapped[list["Tag"]] = relationship(
         secondary=tagged_recommendations
     )
+
+    def __repr__(self) -> str:
+        return self.title
 
 
 class Tag(Base):

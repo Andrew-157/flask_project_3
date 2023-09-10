@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center">Recommend anything you want and share your opinion about it</h1>
+    <h3 class="text-muted text-center"><small>All fields without <mark>*</mark> are optional.</small></h3>
+    <form action="{{ url_for('main.post_recommendation') }}" method="post">
+        {{ form.csrf_token }}
+        <div class=" mb-3 mt-3">
+            {{ form.fiction_type.label(class="form-label") }}
+            {{ form.fiction_type(placeholder="Enter a type of fiction", class="form-control")}}
+            <p class="text-muted"><small>{{ form.fiction_type.description}}</small></p>
+            {% if form.fiction_type.errors %}
+            {% for error in form.fiction_type.errors %}
+            <p class="text-danger fw-bold">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="mb-3 mt-3">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(placeholder="Enter the title", class="form-control")}}
+            <p class="text-muted"><small>{{ form.title.description }}</small></p>
+            {% if form.title.errors %}
+            {% for error in form.title.errors %}
+            <p class="text-danger fw-bold">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="mb-3 mt-3">
+            {{ form.short_description.label(class="form-label") }}
+            {{ form.short_description(placeholder="Enter short description", class="form-control")}}
+            <p class="text-muted"><small>{{ form.short_description.description }}</small></p>
+            {% if form.short_description.errors %}
+            {% for error in form.short_description.errors %}
+            <p class="text-danger fw-bold">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="mb-3 mt-3">
+            {{ form.opinion.label(class="form-label") }}
+            {{ form.opinion(placeholder="Enter your opinion", class="form-control")}}
+            <p class="text-muted"><small>{{ form.opinion.description }}</small></p>
+            {% if form.opinion.errors %}
+            {% for error in form.opinion.errors %}
+            <p class="text-danger fw-bold">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="mb-3 mt-3">
+            {{ form.tags.label(class="form-label") }}
+            {{ form.tags(placeholder="Enter some tags", class="form-control")}}
+            <p class="text-muted"><small>{{ form.tags.description }}</small></p>
+            {% if form.tags.errors %}
+            {% for error in form.tags.errors %}
+            <p class="text-danger fw-bold">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">Recommend</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
