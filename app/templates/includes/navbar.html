@@ -18,7 +18,7 @@
             {% else %}
             <ul class="nav nav-pills justify-content-end">
                 <li class="nav-item">
-                    <a class="nav-link" href="">{{ g.user }}</a>
+                    <a class="nav-link" href="{{ url_for('main.private_page') }}">{{ g.user }}</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('auth.update_user') }}">Update Profile</a>
