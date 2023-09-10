@@ -3,5 +3,15 @@
 {% block content %}
 <div class="container py-5">
     <h1>{{ recommendation }}</h1>
+    {% if g.user == recommendation.user %}
+    <a href="{{ url_for('main.update_recommendation', id=recommendation.id) }}" class="btn btn-primary">Update your
+        recommendation</a>
+    <form action="{{ url_for('main.delete_recommendation', id=recommendation.id) }}" method="post">
+        {% if config.WTF_CSRF_ENABLED %}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {% endif %}
+        <button class="btn btn-danger" type="submit">Delete recommendation</button>
+    </form>
+    {% endif %}
 </div>
 {% endblock %}
