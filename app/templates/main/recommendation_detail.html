@@ -4,6 +4,18 @@
 <div class="container py-5">
     <div class="container text-center">
         <h1>{{ recommendation }}</h1>
+        <form action="{{ url_for('main.save_unsave_recommendation', id=recommendation.id) }}" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% if g.user %}
+            {% if recommendation in g.user.saved_recommendations %}
+            <button class="btn btn-secondary">Remove Recommendation from the saved.</button>
+            {% else %}
+            <button class="btn btn-secondary">Save Recommendation</button>
+            {% endif %}
+            {% else %}
+            <button class="btn btn-secondary">Save Recommendation</button>
+            {% endif %}
+        </form>
         <h3>Recommendation of fiction type:
             <a href="">{{ recommendation.fiction_type.name.capitalize() }}</a>
         </h3>

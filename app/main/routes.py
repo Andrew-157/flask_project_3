@@ -306,3 +306,34 @@ class LeavePositiveReactionView(LeaveReactionBaseView):
 
 class LeaveNegativeReactionView(LeaveReactionBaseView):
     is_positive = False
+
+
+class AddRemoveSavedRecommendation(MethodView):
+    methods = ['POST']
+
+    def get_redirect_url(self):
+        return redirect(url_for('main.recommendation_detail',
+                                id=self.recommendation.id))
+
+    def post(self, id):
+        current_user: User | None = g.user
+        recommendation = db.session.get(Recommendation, id)
+        if not recommendation:
+            abort(404)
+        self.recommendation = recommendation
+        if not current_user:
+            flash(
+                message='Please, login or register to save this recommendation.', category='info')
+            return self.get_redirect_url()
+        if recommendation in current_user.saved_recommendations:
+            current_user.saved_recommendations.remove(recommendation)
+            db.session.add(current_user)
+            db.session.commit()
+            flash(message='You removed this recommendation from the saved.',
+                  category='success')
+        else:
+            current_user.saved_recommendations.append(recommendation)
+            db.session.add(current_user)
+            db.session.commit()
+            flash(message='You saved this recommendation.', category='success')
+        return self.get_redirect_url()

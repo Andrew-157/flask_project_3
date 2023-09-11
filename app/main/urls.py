@@ -25,3 +25,8 @@ bp.add_url_rule(
     view_func=routes.LeaveNegativeReactionView.as_view(
         name='dislike_recommendation')
 )
+bp.add_url_rule(
+    rule='/recommendations/<int:id>/saved/',
+    view_func=routes.AddRemoveSavedRecommendation.as_view(
+        name='save_unsave_recommendation')
+)

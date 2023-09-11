@@ -76,7 +76,9 @@ saved_recommendations = Table(
     Column('user_id',
            ForeignKey('user.id',
                       ondelete='CASCADE',
-                      onupdate='CASCADE'), primary_key=True)
+                      onupdate='CASCADE'), primary_key=True),
+    UniqueConstraint('recommendation_id', 'user_id',
+                     name='user_saved_recommendation_uc')
 )
 
 
