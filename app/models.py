@@ -30,6 +30,10 @@ class User(Base):
         back_populates='user', cascade='all, delete-orphan'
     )
 
+    saved_recommendations: Mapped[list["Recommendation"]] = relationship(
+        secondary="saved_recommendations"
+    )
+
     def __repr__(self) -> str:
         return self.username
 
@@ -58,6 +62,19 @@ tagged_recommendations = Table(
                       onupdate='CASCADE'), primary_key=True),
     Column('tag_id',
            ForeignKey('tag.id',
+                      ondelete='CASCADE',
+                      onupdate='CASCADE'), primary_key=True)
+)
+
+saved_recommendations = Table(
+    'saved_recommendations',
+    Base.metadata,
+    Column('recommendation_id',
+           ForeignKey('recommendation.id',
+                      ondelete='CASCADE',
+                      onupdate='CASCADE'), primary_key=True),
+    Column('user_id',
+           ForeignKey('user.id',
                       ondelete='CASCADE',
                       onupdate='CASCADE'), primary_key=True)
 )
