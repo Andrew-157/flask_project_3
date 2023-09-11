@@ -6,6 +6,7 @@ from sqlalchemy import DateTime
 from sqlalchemy import Table
 from sqlalchemy import String
 from sqlalchemy import Boolean
+from sqlalchemy import UniqueConstraint
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -124,3 +125,6 @@ class Reaction(Base):
 
     recommendation: Mapped[Recommendation] = relationship(
         back_populates='reactions')
+
+    __table_args__ = (UniqueConstraint('user_id', 'recommendation_id',
+                                       name='user_recommendation_uc'),)

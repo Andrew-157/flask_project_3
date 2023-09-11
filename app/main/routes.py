@@ -11,9 +11,11 @@ from flask import request
 from flask.views import MethodView
 
 from .. import login_required, db
-from ..models import User, FictionType, Tag, Recommendation
+from ..models import User, FictionType, Tag, Recommendation, Reaction
 from .forms import PostUpdateRecommendationForm
-from .crud import get_fiction_type_by_name, get_tag_by_name, get_recommendation_by_id
+from .crud import get_fiction_type_by_name, get_tag_by_name, get_recommendation_by_id,\
+    get_reaction_by_user_id_and_recommendation_id, count_positive_reactions_for_recommendation,\
+    count_negative_reactions_for_recommendation
 
 bp = Blueprint(name='main',
                import_name=__name__)
@@ -116,8 +118,20 @@ def recommendation_detail(id):
     recommendation = get_recommendation_by_id(id=id)
     if not recommendation:
         abort(404)
+    reaction = None
+    current_user: User | None = g.user
+    if current_user:
+        reaction = get_reaction_by_user_id_and_recommendation_id(user_id=current_user.id,
+                                                                 recommendation_id=recommendation.id)
+    positive_reactions = count_positive_reactions_for_recommendation(
+        recommendation_id=recommendation.id)
+    negative_reactions = count_negative_reactions_for_recommendation(
+        recommendation_id=recommendation.id)
     return render_template('main/recommendation_detail.html',
-                           recommendation=recommendation)
+                           recommendation=recommendation,
+                           reaction=reaction,
+                           positive_reactions=positive_reactions,
+                           negative_reactions=negative_reactions)
 
 
 class UpdateRecommendationView(MethodView):
@@ -225,3 +239,70 @@ class DeleteRecommendationView(MethodView):
         flash(message='You successfully deleted your recommendation.',
               category='success')
         return redirect(url_for('main.index'))
+
+
+class LeaveReactionBaseView(MethodView):
+    is_positive = None
+    methods = ['POST']
+
+    def get_redirect_url(self):
+        return redirect(url_for('main.recommendation_detail',
+                                id=self.recommendation.id))
+
+    def post(self, id):
+        current_user: User | None = g.user
+        recommendation = db.session.get(Recommendation, id)
+        if not recommendation:
+            abort(404)
+        self.recommendation = recommendation
+        if not current_user:
+            flash(message='Please, login or register to leave your reaction about the recommendation.',
+                  category='info')
+            return self.get_redirect_url()
+        reaction = get_reaction_by_user_id_and_recommendation_id(
+            user_id=current_user.id,
+            recommendation_id=recommendation.id)
+        if self.is_positive == False:
+            if not reaction:
+                reaction = Reaction(
+                    is_positive=False,
+                    user_id=current_user.id,
+                    recommendation_id=recommendation.id
+                )
+                db.session.add(reaction)
+                db.session.commit()
+            else:
+                if reaction.is_positive == True:
+                    reaction.is_positive = False
+                    db.session.add(reaction)
+                    db.session.commit()
+                elif reaction.is_positive == False:
+                    db.session.delete(reaction)
+                    db.session.commit()
+        if self.is_positive == True:
+            if not reaction:
+                reaction = Reaction(
+                    is_positive=True,
+                    user_id=current_user.id,
+                    recommendation_id=recommendation.id
+                )
+                db.session.add(reaction)
+                db.session.commit()
+            else:
+                if reaction.is_positive == False:
+                    reaction.is_positive = True
+                    db.session.add(reaction)
+                    db.session.commit()
+                elif reaction.is_positive == True:
+                    db.session.delete(reaction)
+                    db.session.commit()
+
+        return self.get_redirect_url()
+
+
+class LeavePositiveReactionView(LeaveReactionBaseView):
+    is_positive = True
+
+
+class LeaveNegativeReactionView(LeaveReactionBaseView):
+    is_positive = False

@@ -15,3 +15,13 @@ bp.add_url_rule(
     view_func=routes.DeleteRecommendationView.as_view(
         name='delete_recommendation')
 )
+bp.add_url_rule(
+    rule='/recommendations/<int:id>/like/',
+    view_func=routes.LeavePositiveReactionView.as_view(
+        name='like_recommendation')
+)
+bp.add_url_rule(
+    rule='/recommendations/<int:id>/dislike/',
+    view_func=routes.LeaveNegativeReactionView.as_view(
+        name='dislike_recommendation')
+)

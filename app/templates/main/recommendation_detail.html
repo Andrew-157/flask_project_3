@@ -35,9 +35,9 @@
                         <div class="btn-group">
                             <form action="{{ url_for('main.delete_recommendation', id=recommendation.id) }}"
                                 method="post">
-                                {% if config.WTF_CSRF_ENABLED %}
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                {% endif %}
+                                <!-- {% if config.WTF_CSRF_ENABLED %}
+                                {% endif %} -->
                                 <button class="btn btn-danger" type="submit">Yes</button>
                             </form>
                         </div>
@@ -50,16 +50,6 @@
         </div>
     </div>
     {% endif %}
-    <!-- {% if g.user == recommendation.user %}
-    <a href="{{ url_for('main.update_recommendation', id=recommendation.id) }}" class="btn btn-primary">Update your
-        recommendation</a>
-    <form action="{{ url_for('main.delete_recommendation', id=recommendation.id) }}" method="post">
-        {% if config.WTF_CSRF_ENABLED %}
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        {% endif %}
-        <button class="btn btn-danger" type="submit">Delete recommendation</button>
-    </form>
-    {% endif %} -->
     <div class="container">
         <div class="row">
             <div class="col-md-6">
@@ -73,6 +63,32 @@
                     <h4 class="text-center">Opinion</h4>
                     <p class="text-break">{{ recommendation.opinion }}</p>
                 </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-2">
+                <div class="btn-group">
+                    <form action="{{ url_for('main.like_recommendation', id=recommendation.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-primary" type="submit">Like</button>
+                    </form>
+                    <form action="{{ url_for('main.dislike_recommendation', id=recommendation.id) }}" method="post">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button class="btn btn-primary" type="submit">Dislike</button>
+                    </form>
+                </div>
+                {% if reaction %}
+                {% if reaction.is_positive == True %}
+                <p><strong><small>You liked this recommendation.</small></strong></p>
+                {% elif reaction.is_positive == False %}
+                <p><strong><small>You disliked this recommendation.</small></strong></p>
+                {% endif %}
+                {% endif %}
+            </div>
+            <div class="col">
+                <p>{{ positive_reactions }} Likes/ {{ negative_reactions }} Dislikes</p>
             </div>
         </div>
     </div>
