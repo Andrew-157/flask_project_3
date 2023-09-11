@@ -5,6 +5,7 @@ from sqlalchemy import Column
 from sqlalchemy import DateTime
 from sqlalchemy import Table
 from sqlalchemy import String
+from sqlalchemy import Boolean
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
 from sqlalchemy.orm import relationship
@@ -21,6 +22,10 @@ class User(Base):
     hashed_password: Mapped[str] = mapped_column(String(length=300))
 
     recommendations: Mapped[list["Recommendation"]] = relationship(
+        back_populates='user', cascade='all, delete-orphan'
+    )
+
+    reactions: Mapped[list["Reaction"]] = relationship(
         back_populates='user', cascade='all, delete-orphan'
     )
 
@@ -85,6 +90,9 @@ class Recommendation(Base):
         secondary=tagged_recommendations
     )
 
+    reactions: Mapped[list["Reaction"]] = relationship(
+        back_populates='recommendation', cascade='all, delete-orphan')
+
     def __repr__(self) -> str:
         return self.title
 
@@ -97,3 +105,22 @@ class Tag(Base):
 
     def __repr__(self) -> str:
         return self.name
+
+
+class Reaction(Base):
+    __tablename__ = 'reaction'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    is_positive: Mapped[bool] = mapped_column(Boolean(), default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id',
+                                                    ondelete='CASCADE',
+                                                    onupdate='CASCADE'))
+    recommendation_id: Mapped[int] = mapped_column(ForeignKey('recommendation.id',
+                                                              ondelete='CASCADE',
+                                                              onupdate='CASCADE'))
+
+    user: Mapped[User] = relationship(
+        back_populates='reactions')
+
+    recommendation: Mapped[Recommendation] = relationship(
+        back_populates='reactions')
