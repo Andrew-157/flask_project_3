@@ -92,28 +92,40 @@
                 <div class="btn-group">
                     <form action="{{ url_for('main.like_recommendation', id=recommendation.id) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% if reaction.is_positive == True %}
+                        <button class="btn btn-secondary" type="submit">
+                            {{ positive_reactions }} like{{ positive_reactions|pluralize }}
+                        </button>
+                        {% else %}
                         <button class="btn btn-primary" type="submit">
-                            {{ positive_reactions }} like{{ positive_reactions|pluralize }}</button>
+                            {{ positive_reactions }} like{{ positive_reactions|pluralize }}
+                        </button>
+                        {% endif %}
                     </form>
                     <form action="{{ url_for('main.dislike_recommendation', id=recommendation.id) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button class="btn btn-primary" type="submit">
+                        {% if reaction.is_positive == False %}
+                        <button class="btn btn-secondary" type="submit">
                             {{ negative_reactions }} dislike{{negative_reactions|pluralize}}</button>
+                        {% else %}
+                        <button class="btn btn-primary" type="submit">
+                            {{ negative_reactions }} dislike{{ negative_reactions|pluralize }}
+                        </button>
+                        {% endif %}
                     </form>
                 </div>
-                {% if reaction %}
-                {% if reaction.is_positive == True %}
-                <p><strong><small>You liked this recommendation.</small></strong></p>
-                {% elif reaction.is_positive == False %}
-                <p><strong><small>You disliked this recommendation.</small></strong></p>
-                {% endif %}
-                {% endif %}
             </div>
         </div>
     </div>
-    <div class="container">
+    <div class="container py-5">
         <a href="{{ url_for('main.comment_recommendation', id=recommendation.id) }}"
             class="text-decoration-none">Comment this recommendation</a>
+        {% for comment in recommendation.comments %}
+        <div class="container p-3 my-3 border">
+            <p>Comment left by <a href="" class="text-decoration-none">@{{ comment.user }}</a></p>
+            <p class="text-break">{{ comment.body }}</p>
+        </div>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
