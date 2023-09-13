@@ -181,3 +181,25 @@ class Comment(Base):
 
     def __repr__(self):
         return self.body
+
+
+class CommentReaction(Base):
+    __tablename__ = 'comment_reaction'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    is_positive: Mapped[bool] = mapped_column(Boolean(), default=False)
+    by_recommendation_author: Mapped[bool] = mapped_column(
+        Boolean(), default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id',
+                                                    ondelete='CASCADE',
+                                                    onupdate='CASCADE'))
+    comment_id: Mapped[int] = mapped_column(ForeignKey('comment.id',
+                                                       ondelete='CASCADE',
+                                                       onupdate='CASCADE'))
+
+    user: Mapped[User] = relationship(
+        back_populates='comments_reactions')
+
+    comment: Mapped[Comment] = relationship(
+        back_populates='reactions'
+    )
