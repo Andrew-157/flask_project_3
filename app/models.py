@@ -34,6 +34,10 @@ class User(Base):
         secondary="saved_recommendations"
     )
 
+    comments: Mapped[list["Comment"]] = relationship(
+        back_populates='user', cascade='all, delete-orphan'
+    )
+
     def __repr__(self) -> str:
         return self.username
 
@@ -113,6 +117,9 @@ class Recommendation(Base):
     reactions: Mapped[list["Reaction"]] = relationship(
         back_populates='recommendation', cascade='all, delete-orphan')
 
+    comments: Mapped[list["Comment"]] = relationship(
+        back_populates='recommendation', cascade='all, delete-orphan')
+
     def __repr__(self) -> str:
         return self.title
 
@@ -147,3 +154,26 @@ class Reaction(Base):
 
     __table_args__ = (UniqueConstraint('user_id', 'recommendation_id',
                                        name='user_recommendation_uc'),)
+
+
+class Comment(Base):
+    __tablename__ = 'comment'
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    body: Mapped[str] = mapped_column(String())
+    user_id: Mapped[int] = mapped_column(ForeignKey('user.id',
+                                                    ondelete='CASCADE',
+                                                    onupdate='CASCADE'))
+    recommendation_id: Mapped[int] = mapped_column(ForeignKey('recommendation.id',
+                                                              ondelete='CASCADE',
+                                                              onupdate='CASCADE'))
+
+    user: Mapped[User] = relationship(
+        back_populates='comments')
+
+    recommendation: Mapped[Recommendation] = relationship(
+        back_populates='comments'
+    )
+
+    def __repr__(self):
+        return self.body
