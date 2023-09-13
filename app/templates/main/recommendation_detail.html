@@ -84,11 +84,13 @@
                 <div class="btn-group">
                     <form action="{{ url_for('main.like_recommendation', id=recommendation.id) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button class="btn btn-primary" type="submit">Like</button>
+                        <button class="btn btn-primary" type="submit">
+                            {{ positive_reactions }} like{{ positive_reactions|pluralize }}</button>
                     </form>
                     <form action="{{ url_for('main.dislike_recommendation', id=recommendation.id) }}" method="post">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                        <button class="btn btn-primary" type="submit">Dislike</button>
+                        <button class="btn btn-primary" type="submit">
+                            {{ negative_reactions }} dislike{{negative_reactions|pluralize}}</button>
                     </form>
                 </div>
                 {% if reaction %}
@@ -98,9 +100,6 @@
                 <p><strong><small>You disliked this recommendation.</small></strong></p>
                 {% endif %}
                 {% endif %}
-            </div>
-            <div class="col">
-                <p>{{ positive_reactions }} Likes/ {{ negative_reactions }} Dislikes</p>
             </div>
         </div>
     </div>

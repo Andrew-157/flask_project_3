@@ -5,6 +5,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_wtf.csrf import CSRFProtect
 from sqlalchemy.orm import DeclarativeBase
+from jinja2_pluralize import pluralize_dj
 
 from config import config
 
@@ -38,6 +39,8 @@ def create_app(config_name: str = 'production'):
 
     db.init_app(app)
     migrate.init_app(app=app, db=db)
+
+    app.jinja_env.filters['pluralize'] = pluralize_dj
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
