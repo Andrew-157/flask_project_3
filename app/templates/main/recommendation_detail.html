@@ -111,5 +111,9 @@
             </div>
         </div>
     </div>
+    <div class="container">
+        <a href="{{ url_for('main.comment_recommendation', id=recommendation.id) }}"
+            class="text-decoration-none">Comment this recommendation</a>
+    </div>
 </div>
 {% endblock %}

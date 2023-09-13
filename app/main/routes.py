@@ -11,8 +11,8 @@ from flask import request
 from flask.views import MethodView
 
 from .. import login_required, db
-from ..models import User, FictionType, Tag, Recommendation, Reaction
-from .forms import PostUpdateRecommendationForm
+from ..models import User, FictionType, Tag, Recommendation, Reaction, Comment
+from .forms import PostUpdateRecommendationForm, PostUpdateCommentForm
 from .crud import get_fiction_type_by_name, get_tag_by_name, get_recommendation_by_id,\
     get_reaction_by_user_id_and_recommendation_id, count_positive_reactions_for_recommendation,\
     count_negative_reactions_for_recommendation
@@ -337,3 +337,52 @@ class AddRemoveSavedRecommendation(MethodView):
             db.session.commit()
             flash(message='You saved this recommendation.', category='success')
         return self.get_redirect_url()
+
+
+class PostCommentView(MethodView):
+    methods = ['GET', 'POST']
+
+    def __init__(self):
+        self.form_class = PostUpdateCommentForm
+        self.template_name = 'main/post_comment.html'
+        self.success_message = 'You successfully commented this recommendation.'
+        self.info_message = 'Please, login or register to comment the recommendation.'
+
+    def get(self, id):
+        recommendation = db.session.get(Recommendation, id)
+        if not recommendation:
+            abort(404)
+        current_user: User | None = g.user
+        if not current_user:
+            flash(message=self.info_message,
+                  category='info')
+            return redirect(url_for('main.recommendation_detail', id=recommendation.id))
+        form = self.form_class()
+        return render_template(self.template_name,
+                               form=form,
+                               recommendation=recommendation)
+
+    def post(self, id):
+        recommendation = db.session.get(Recommendation, id)
+        if not recommendation:
+            abort(404)
+        current_user: User | None = g.user
+        if not current_user:
+            flash(message=self.info_message,
+                  category='info')
+            return redirect(url_for('main.recommendation_id', id=recommendation.id))
+        form = self.form_class(formdata=request.form)
+        if form.validate_on_submit():
+            new_comment = Comment(
+                body=form.body.data,
+                user_id=current_user.id,
+                recommendation_id=recommendation.id)
+            db.session.add(new_comment)
+            db.session.commit()
+            flash(message=self.success_message,
+                  category='success')
+            return redirect(url_for('main.recommendation_detail',
+                                    id=recommendation.id))
+        return render_template(self.template_name,
+                               form=form,
+                               recommendation=recommendation)

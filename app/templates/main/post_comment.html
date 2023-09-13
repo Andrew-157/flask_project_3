@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center">Comment Recommendation: <a href="" class="text-decoration-none">
+            {{ recommendation.title }}</a></h1>
+    <h3 class="text-center text-muted"><small>All fields without <mark>*</mark> are optional.</small></h3>
+    <form action="{{ url_for('main.comment_recommendation', id=recommendation.id) }}" method="post">
+        {{ form.csrf_token }}
+        <div class="mb-3 mt-3">
+            {{ form.body.label(class="form-label") }}
+            {{ form.body(placeholder="Enter your comment", class="form-control", style="height: 150px;")}}
+            <p class="text-muted"><small>{{ form.body.description}}</small></p>
+            {% if form.body.errors %}
+            {% for error in form.body.errors %}
+            <p class="text-danger fw-bold">{{ error }}</p>
+            {% endfor %}
+            {% endif %}
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary btn-lg">Comment</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

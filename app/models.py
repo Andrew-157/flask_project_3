@@ -161,6 +161,10 @@ class Comment(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     body: Mapped[str] = mapped_column(String())
+    published: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=datetime.utcnow())
+    updated: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), nullable=True)
     user_id: Mapped[int] = mapped_column(ForeignKey('user.id',
                                                     ondelete='CASCADE',
                                                     onupdate='CASCADE'))

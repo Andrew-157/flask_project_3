@@ -23,3 +23,10 @@ class PostUpdateRecommendationForm(FlaskForm):
                             description='For example: My favorite movie.')
     tags = StringField(label='Tags',
                        description='Write tags, separating them with a comma. #-sign is unnecessary.')
+
+
+class PostUpdateCommentForm(FlaskForm):
+    body = TextAreaField(label='Your Comment*',
+                         validators=[InputRequired(),
+                                     Length(min=5)],
+                         description='For example: Thank you for your recommendation!')

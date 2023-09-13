@@ -30,3 +30,7 @@ bp.add_url_rule(
     view_func=routes.AddRemoveSavedRecommendation.as_view(
         name='save_unsave_recommendation')
 )
+bp.add_url_rule(
+    rule='/recommendations/<int:id>/comment/',
+    view_func=routes.PostCommentView.as_view(name='comment_recommendation')
+)
